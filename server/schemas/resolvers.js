@@ -40,32 +40,35 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
+
     saveBook: async (parent, args, context) => {
       if (context.user) {
-        const book = await Book.create({ ...args, username: context.user.username });
-
-        user =await User.findByIdAndUpdate(
-          { _id: context.user._id },
-          { $push: { books: book._id } },
-          { new: true }
-        );
-
-        return user;
+        try {
+          const updatedUser = await User.findOneAndUpdate(
+            { _id: context.user._id },
+            { $addToSet: { savedBooks: args } },
+            { new: true, runValidators: true }
+          );
+          return res.json(updatedUser);
+        } catch (err) {
+          console.log(err);
+          return res.status(400).json(err);
+        }
       }
 
       throw new AuthenticationError('You need to be logged in!');
     },
     removeBook: async (parent, args, context) => {
       if (context.user) {
-        const book = await Book.findOne({ bookId: args });
-
-        user = await User.findByIdAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { books: book.BookId } },
+          { $pull: { savedBooks: { bookId: args.bookId } } },
           { new: true }
         );
-
-        return user;
+        if (!updatedUser) {
+          return res.status(404).json({ message: "Couldn't find user with this id!" });
+        }
+        return res.json(updatedUser);
       }
 
       throw new AuthenticationError('You need to be logged in!');
