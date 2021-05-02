@@ -43,13 +43,14 @@ const SearchBooks = () => {
       }
 
       const { items } = await response.json();
-
+      console.log(items)
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || '',
+        link: book.volumeInfo.infoLink
       }));
 
       setSearchedBooks(bookData);
@@ -73,7 +74,8 @@ const SearchBooks = () => {
 
     try {
       await saveBook({
-        variables: { authors:bookToSave.authors, description:bookToSave.description, title:bookToSave.title, bookId:bookToSave.bookId, image:bookToSave.image, link:bookToSave.link  }
+        variables: {...bookToSave}
+        //variables: { authors:bookToSave.authors, description:bookToSave.description, title:bookToSave.title, bookId:bookToSave.bookId, image:bookToSave.image, link:bookToSave.link  }
       });
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
@@ -122,9 +124,11 @@ const SearchBooks = () => {
             return (
               <Card key={book.bookId} border='dark'>
                 {book.image ? (
-                  <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' />
+                  <a href={book.link}>
+                    <Card.Img  src={book.image} alt={`The cover for ${book.title}`} variant='top' />
+                  </a>
                 ) : null}
-                <Card.Body>
+                <Card.Body> 
                   <Card.Title>{book.title}</Card.Title>
                   <p className='small'>Authors: {book.authors}</p>
                   <Card.Text>{book.description}</Card.Text>
