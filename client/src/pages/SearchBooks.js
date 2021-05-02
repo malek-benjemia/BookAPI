@@ -43,7 +43,7 @@ const SearchBooks = () => {
       }
 
       const { items } = await response.json();
-      console.log(items)
+      
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
@@ -72,16 +72,18 @@ const SearchBooks = () => {
       return false;
     }
 
-    try {
-      await saveBook({
-        variables: {...bookToSave}
-        //variables: { authors:bookToSave.authors, description:bookToSave.description, title:bookToSave.title, bookId:bookToSave.bookId, image:bookToSave.image, link:bookToSave.link  }
-      });
-      // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-    } catch (e) {
-      console.error(e);
-    }
+      try {
+        
+        const { data } = await saveBook({
+          variables: { bookInput: bookToSave }
+        });
+        
+        // save id if sucessfull
+        //if book successfully saves to user's account, save book id to state
+        setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      } catch (e) {
+        console.error(e);
+      }
     
     
   };

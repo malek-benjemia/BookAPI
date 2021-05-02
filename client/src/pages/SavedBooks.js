@@ -11,11 +11,10 @@ import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  
-  const { data: userData } = useQuery(QUERY_GET_ME);
 
-  console.log(userData); 
-  
+  const { loading, data } = useQuery(QUERY_GET_ME);
+  const userData= data?.me || {};
+
 
   const [removeBook] = useMutation(REMOVE_BOOK);
 
@@ -26,25 +25,24 @@ const SavedBooks = () => {
     if (!token) {
       return false;
     }
-
     try {
       await removeBook({
         variables: {bookId:bookId}
       });
-     
+        
         // upon success, remove book's id from localStorage
         removeBookId(bookId);
+
     } catch (e) {
       console.error(e);
     }
-
-    
   };
 
+  
   // if data isn't here yet, say so
-  /*if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
-  }*/
+  }
 
   return (
     <>
