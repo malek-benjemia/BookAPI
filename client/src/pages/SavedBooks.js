@@ -41,9 +41,11 @@ const SavedBooks = () => {
     getUserData();
   }, [userDataLength]);*/
 
+
   const { data: userData } = useQuery(QUERY_GET_ME);
 
-  console.log(userData)
+  console.log(userData); 
+  
 
   const [removeBook] = useMutation(REMOVE_BOOK);
 
